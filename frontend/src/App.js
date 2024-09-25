@@ -1,35 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// App.js will render AppRoutes component to display pages depending on URL route.
+import React from "react";
+import AppRoutes from "./routes/AppRoutes"; // Import the Routes component
 
 function App() {
-  const [state, setState] = useState({
-    msg: ''
-  });
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch('http://localhost:5555/api/notams'); // Replace with your API endpoint
-      const data = await response.json();
-
-      // Assuming the API response contains variable1 and variable2
-      setState({
-        msg: data.msg
-      });
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-
-
   return (
     <div>
-      <h1>{state.msg}</h1>
+      <AppRoutes />
     </div>
-
   );
 }
 
