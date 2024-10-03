@@ -40,6 +40,8 @@
 .notam-content {
   font-size: 1rem;
   color: black;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .notam-error {
@@ -80,3 +82,39 @@
 .notam-submit-button:hover {
   background-color: #0056b3;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+thead th {
+  background-color: white;
+  color: black;
+  padding: 10px;
+  border-bottom: 2px solid #dddddd;
+  text-align: left;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #dddddd;
+}
+
+th, td {
+  text-align: left;
+}
+
