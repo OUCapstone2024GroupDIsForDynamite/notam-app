@@ -42,3 +42,7 @@ class GeoUtilities():
         """Returns the coordinate for whichever type of code (iata or icao) airport is"""
         return self.icao_codes.get(airport) or self.iata_codes.get(airport)
         
+    def build_flight_path(self, coordinate_a, coordinate_b):
+        """Return flight path points between two coordinates"""
+        """Under Construction"""
+        return [coordinate_a, coordinate_b]
