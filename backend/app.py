@@ -1,12 +1,13 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 
+from utilities.GeoUtilities import GeoUtilities
+from utilities.NotamFetcher import NotamFetcher
+from objects.Coordinate import Coordinate
+
 import sys
 import os
-import requests
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../config')))
-
-from config import CLIENT_ID, CLIENT_SECRET, BASE_URL
 
 
 app = Flask(__name__)
@@ -19,41 +20,38 @@ def get_notams():
     response = jsonify({'msg': 'NOTAM'})
     return response
 
-# New endpoint to return specific airport location data based on its ICAO_location
-@app.route('/api/notam/<location>', methods=['GET'])
-def get_notam(location):
-    notam = fetch_notam(location)
-    if notam:
-        response = jsonify(notam)
-    else:
-        response = jsonify({'error': 'NOTAM not found'}), 404
-    return response
+# New endpoint to generate a flight briefing based on two airport codes
+@app.route('/api/notam/<airport_a>/<airport_b>', methods=['GET'])
+def generate_flight_briefing(airport_a, airport_b):
+    # Get querying coordinates
+    GeoUtils = GeoUtilities()
 
+    airport_a_coor = GeoUtils.geo_resolve(airport_a)
+    airport_b_coor = GeoUtils.geo_resolve(airport_b)
+    flightpath_coords = GeoUtils.build_flight_path(airport_a_coor, airport_b_coor)
+    
+    # Request Notams. For now, this returns a string instead of a list of NOTAMs.
+    notamFetcher = NotamFetcher()
 
-def fetch_notam(icao_location, response_format='geoJson'):
+    notams = notamFetcher.fetch_by_coordinate(flightpath_coords)
+    
+    
+    ## Under Construction
 
-    headers = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET
-    }
-    params = {
-        'icaoLocation': icao_location,
-        'responseFormat': response_format
-    }    
+    # Delete repeated Notams
+    # NotamUtils.delete_repeated_notams(notams)
+    
+    # Sort Notams. "X" here can be replaced by any implementing class of NotamSorter, e.g., DummySorter
+    # notams = XSorter.sort(Notams)
+    
+    
+    # Prep for Display
+    # displayString = ""
+    # for ( Notam notam : notams)
+    #     displayString.add( notam.jsonify_notam())
 
-    try:
-        response = requests.get(f"{BASE_URL}/notams", headers=headers, params=params)
-        print("Status Code:", response.status_code)
-        print("Response Text:", response.text[:500])
-
-        response.raise_for_status()
-        data = response.json()
-        notam_list = [item['properties']['coreNOTAMData']['notam'] for item in data['items']]
-        return notam_list
-
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred while fetching NOTAMs: {e}")
-        return None
+        
+    return jsonify(notams)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555, debug=True)

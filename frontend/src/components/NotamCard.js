@@ -2,22 +2,28 @@ import React, { useState } from "react";
 import "../styles/NotamCard.css"; // Import the CSS file for styling
 
 const NotamCard = () => {
-  const [location, setLocation] = useState("");
+  const [departureLocation, setDepartureLocation] = useState("");
+  const [arrivalLocation, setArrivalLocation] = useState("");
   const [notams, setNotams] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(""); // Added state for error message
 
-  const handleInputChange = (e) => {
-    setLocation(e.target.value);
+  const handleDepartureChange = (e) => {
+    setDepartureLocation(e.target.value);
   };
+
+  const handleArrivalChange = (e) => {
+    setArrivalLocation(e.target.value);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from submitting the default way
     setError(""); // Clear previous errors
     try {
       const response = await fetch(
-        `http://localhost:5555/api/notam/${location}`
+        `http://localhost:5555/api/notam/${departureLocation}/${arrivalLocation}`
       );
+      console.log(response)
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched NOTAM data:", data) // log fetched data
@@ -53,11 +59,22 @@ const NotamCard = () => {
       <form onSubmit={handleSubmit} className="notam-form">
         <input
           type="text"
-          value={location}
-          onChange={handleInputChange}
-          placeholder="Enter an ICAO Location"
+          value={departureLocation}
+          onChange={handleDepartureChange}
+          placeholder="Enter Departure Airport Code"
           className="notam-input"
         />
+      </form>
+      <form onSubmit={handleSubmit} className="notam-form">
+        <input
+          type="text"
+          value={arrivalLocation}
+          onChange={handleArrivalChange}
+          placeholder="Enter Arrival Airport Code"
+          className="notam-input"
+        />
+      </form>
+      <form onSubmit={handleSubmit}>
         <button type="submit" className="notam-submit-button">
           Fetch NOTAM
         </button>
