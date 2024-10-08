@@ -24,19 +24,17 @@ def get_notams():
 @app.route('/api/notam/<airport_a>/<airport_b>', methods=['GET'])
 def generate_flight_briefing(airport_a, airport_b):
     # Get querying coordinates
-    GeoUtils = GeoUtilities()
+    geo_utils = GeoUtilities()
 
-    airport_a_coor = GeoUtils.geo_resolve(airport_a)
-    airport_b_coor = GeoUtils.geo_resolve(airport_b)
-    flightpath_coords = GeoUtils.build_flight_path(airport_a_coor, airport_b_coor)
-    
-    # Request Notams. For now, this returns a string instead of a list of NOTAMs.
-    notamFetcher = NotamFetcher()
+    airport_a_coor = geo_utils.geo_resolve(airport_a)
+    airport_b_coor = geo_utils.geo_resolve(airport_b)
+    flightpath_coords = geo_utils.build_flight_path(airport_a_coor, airport_b_coor)
 
-    notams = notamFetcher.fetch_by_coordinate(flightpath_coords)
-    
-    
-    ## Under Construction
+     # Request Notams. For now, this returns a string instead of a list of NOTAMs.
+    notam_fetcher = NotamFetcher()
+    notams = notam_fetcher.fetch_by_coordinate(flightpath_coords)
+
+     ## Under Construction
 
     # Delete repeated Notams
     # NotamUtils.delete_repeated_notams(notams)
@@ -44,14 +42,11 @@ def generate_flight_briefing(airport_a, airport_b):
     # Sort Notams. "X" here can be replaced by any implementing class of NotamSorter, e.g., DummySorter
     # notams = XSorter.sort(Notams)
     
-    
-    # Prep for Display
-    # displayString = ""
-    # for ( Notam notam : notams)
-    #     displayString.add( notam.jsonify_notam())
 
-        
-    return jsonify(notams)
+    # Convert Notam objects to dictionaries for JSON serialization
+    notam_list = [notam.jsonify_notam() for notam in notams]
+
+    return jsonify(notam_list)  # Return the list of dictionaries as a JSON response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555, debug=True)
