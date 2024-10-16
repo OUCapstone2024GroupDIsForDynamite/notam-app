@@ -1,8 +1,18 @@
-# Flask and React Boilerplate
+# NOTAM Finder
+Our app fetches NOTAM's utilizing the FAA API along a flightpath determined by a user-inputted departure and arrival ICAO or IATA airport codes.
 
-This project is a simple boilerplate for a web application using Flask as the backend and React as the frontend.
+## What NOTAMs Are
+NOTAMS are Notifications to the pilots that provide information about flights in the United states, these include important information, like runway closures, airspace restrictions, and malfunctioning equipments. 
 
-## Setup
+## Configuration
+
+To access the FAA API, alter the config.py file in the backend directory to include your client ID and client Secret
+
+## Contribution Guidelines
+
+We use branches per features, which are tickets in our Jira tracker. After completing changes, rebase off of main and sqaush extraneous commits to clean up the commit history. Then, after four approval requests, your branch can be merged to main.
+
+## Setup and Installation Guidelines
 
 ### Backend (Flask)
 1. Navigate to the `backend` directory.
