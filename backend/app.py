@@ -32,7 +32,7 @@ def generate_flight_briefing(airport_a, airport_b):
 
      # Request Notams. For now, this returns a string instead of a list of NOTAMs.
     notam_fetcher = NotamFetcher()
-    notams = notam_fetcher.fetch_by_coordinate(flightpath_coords)
+    notams = notam_fetcher.fetch_by_coordinates(flightpath_coords)
 
      ## Under Construction
 
