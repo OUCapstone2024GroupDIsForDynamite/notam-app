@@ -12,31 +12,49 @@ class NotamFetcher:
         }
         self.response_format = 'geoJson'
 
-    def fetch_by_coordinate(self, coordinates, radius=10):
+    def fetch_by_coordinates(self, coordinates, radius=10):
         # Returns notams as Notam objects based on an array of coordinates and a radius
         notams = []
 
         for coordinate in coordinates:
-            params = {
-                'responseFormat': self.response_format,
-                'locationLatitude': coordinate.latitude,
-                'locationLongitude': coordinate.longitude,
-                'locationRadius': radius
-            }
+            result = self.fetch_notams(coordinate, radius)
 
-            try:
-                response = requests.get(f"{FAA_API_URL}/notams", headers=self.headers, params=params)
-                print("Status Code:", response.status_code)
-                response.raise_for_status()
-                data = response.json()
+            total_pages = result['totalPages']
+            current_page = result['pageNum']
 
-                # Create Notam objects from the response data
-                for item in data['items']:
-                    notam_as_json = json.dumps(item)  # Convert the item to a JSON string
-                    notams.append(Notam(notam_as_json))  # Add Notam Object to the list
+            # Convert result to Notam objects
+            notams.extend( [ Notam( json.dumps(item) ) for item in result['items']  ] )
 
-            except requests.exceptions.RequestException as e:
-                print(f"An error occurred while fetching NOTAMs: {e}")
-                raise e
+            while (current_page < total_pages):
+                current_page += 1
+                result = self.fetch_notams(coordinate, radius, current_page)
+
+                notams.extend( [ Notam( json.dumps(item) ) for item in result['items']  ] )
 
         return notams
+    
+    # Call API with given parameters
+    def fetch_notams(self, coordinate, radius, page_number= 1):
+        
+        params = {
+                    'responseFormat': self.response_format,
+                    'locationLatitude': coordinate.latitude,
+                    'locationLongitude': coordinate.longitude,
+                    'locationRadius': radius,
+                    'pageSize' : 500,
+                    'pageNum' : page_number
+                }
+
+        try:
+            response = requests.get(f"{FAA_API_URL}/notams", headers=self.headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+            print(f"Fetched {len(data['items'])} notam(s) at ({coordinate.latitude}, {coordinate.longitude}) on page {page_number}/{data['totalPages']}")
+
+            return data
+        
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred while fetching NOTAMs: {e}")
+            raise e
+
