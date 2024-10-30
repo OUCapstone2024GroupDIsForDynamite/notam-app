@@ -30,6 +30,14 @@ class Notam:
         # Text might not have a default in the original JSON, so consider handling it if needed.
         self.text = core_data.get('text', None)
 
+    def __eq__(self, other):
+        if isinstance(other, Notam):
+            return self.id == other.id
+        return False
+    
+    def __hash__(self):
+        return hash(self.id)
+
     def jsonify_notam(self):
         # Return a dictionary representation of the Notam instance
         return {

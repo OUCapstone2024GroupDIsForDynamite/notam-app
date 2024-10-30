@@ -1,5 +1,5 @@
 # Custom rules #
-config.py
+**/config.py
 instance/*
 !instance/.gitignore
 .webassets-cache
