@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from utilities.GeoUtilities import GeoUtilities
 from utilities.NotamFetcher import NotamFetcher
+from utilities.DummySorter import DummySorter
 from objects.Coordinate import Coordinate
 
 import sys
@@ -40,7 +41,7 @@ def generate_flight_briefing(airport_a, airport_b):
     # NotamUtils.delete_repeated_notams(notams)
     
     # Sort Notams. "X" here can be replaced by any implementing class of NotamSorter, e.g., DummySorter
-    # notams = XSorter.sort(Notams)
+    notams = DummySorter().sort(notams)
     
 
     # Convert Notam objects to dictionaries for JSON serialization
