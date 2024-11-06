@@ -14,7 +14,7 @@ class NotamFetcher:
 
     def fetch_by_coordinates(self, coordinates, radius=10):
         # Returns notams as Notam objects based on an array of coordinates and a radius
-        notams = []
+        notams = set()
 
         for coordinate in coordinates:
             result = self.fetch_notams(coordinate, radius)
@@ -23,15 +23,16 @@ class NotamFetcher:
             current_page = result['pageNum']
 
             # Convert result to Notam objects
-            notams.extend( [ Notam( json.dumps(item) ) for item in result['items']  ] )
+            notams.update( [ Notam( json.dumps(item) ) for item in result['items']  ] )
 
             while (current_page < total_pages):
                 current_page += 1
                 result = self.fetch_notams(coordinate, radius, current_page)
 
-                notams.extend( [ Notam( json.dumps(item) ) for item in result['items']  ] )
+                notams.update( [ Notam( json.dumps(item) ) for item in result['items']  ] )
 
-        return notams
+
+        return list(notams)
     
     # Call API with given parameters
     def fetch_notams(self, coordinate, radius, page_number= 1):
