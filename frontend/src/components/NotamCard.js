@@ -5,8 +5,31 @@ const NotamCard = () => {
   const [departureLocation, setDepartureLocation] = useState("");
   const [arrivalLocation, setArrivalLocation] = useState("");
   const [notams, setNotams] = useState(null);
-  const [expanded, setExpanded] = useState(false);
-  const [error, setError] = useState(""); // Added state for error message
+  const [error, setError] = useState("");
+  const [visibleColumns, setVisibleColumns] = useState([
+    "account_id",
+    "affected_fir",
+    "classification",
+    "effective_start",
+    "effective_end",
+    "icao_location",
+    "id",
+    "issued",
+    "last_updated",
+    "location",
+    "maximum_fl",
+    "minimum_fl",
+    "number",
+    "purpose",
+    "scope",
+    "selection_code",
+    "series",
+    // "text",
+    "traffic",
+    "type",
+  ]);
+
+  const [showColumnDropdown, setShowColumnDropdown] = useState(false);
 
   const handleDepartureChange = (e) => {
     setDepartureLocation(e.target.value);
@@ -17,8 +40,8 @@ const NotamCard = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent form from submitting the default way
-    setError(""); // Clear previous errors
+    e.preventDefault();
+    setError("");
     try {
       const response = await fetch(
         `http://localhost:5555/api/notam/${departureLocation}/${arrivalLocation}`
@@ -46,8 +69,7 @@ const NotamCard = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError("An error occurred while fetching the NOTAM."); // Set error message for any fetch errors
+      setError("An error occurred while fetching the NOTAM.");
     }
   };
 
@@ -57,94 +79,148 @@ const NotamCard = () => {
 
   return (
     <div className="notam-content">
-      <div>
-        <form onSubmit={handleSubmit} className="notam-form">
-          <input
-            type="text"
-            value={departureLocation}
-            onChange={handleDepartureChange}
-            placeholder="Enter Departure Airport Code"
-            className="notam-input"
-          />
-        </form>
-        <form onSubmit={handleSubmit} className="notam-form">
-          <input
-            type="text"
-            value={arrivalLocation}
-            onChange={handleArrivalChange}
-            placeholder="Enter Arrival Airport Code"
-            className="notam-input"
-          />
-        </form>
-        <form onSubmit={handleSubmit}>
-          <button type="submit" className="notam-submit-button">
-            Fetch NOTAM
-          </button>
-        </form>
-      </div>
-      {error ? (
-        <div className="notam-error">{error}</div> // Display error message inside the card
-      ) : notams && notams.length > 0 ? (
-        <div>
-          <h1>NOTAM Data</h1>
-          <table
-            border="1"
-            cellPadding="10"
-            style={{ borderCollapse: "collapse", width: "100%" }}
+      <div className="input-container">
+        <input
+          type="text"
+          value={departureLocation}
+          onChange={handleDepartureChange}
+          placeholder="Enter Departure Airport Code"
+          className="notam-input"
+        />
+        <input
+          type="text"
+          value={arrivalLocation}
+          onChange={handleArrivalChange}
+          placeholder="Enter Arrival Airport Code"
+          className="notam-input"
+        />
+        <button type="submit" className="notam-submit-button" onClick={handleSubmit}>
+          Fetch NOTAMS
+        </button>
+        <div style={{ position: "relative" }}>
+          <button
+            className="dropdown-toggle"
+            onClick={() => setShowColumnDropdown(!showColumnDropdown)}
           >
-            <thead>
-              <tr>
-                <th>Account ID</th>
-                <th>Affected FIR</th>
-                <th>Classification</th>
-                <th>Effective Start</th>
-                <th>Effective End</th>
-                <th>ICAO Location</th>
-                <th>ID</th>
-                <th>Issued</th>
-                <th>Last Updated</th>
-                <th>Location</th>
-                <th>Maximum FL</th>
-                <th>Minimum FL</th>
-                <th>Number</th>
-                <th>Purpose</th>
-                <th>Scope</th>
-                <th>Selection Code</th>
-                <th>Series</th>
-                {/* <th>Text</th> */}
-                <th>Traffic</th>
-                <th>Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {notams.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.account_id}</td>
-                  <td>{item.affected_fir}</td>
-                  <td>{item.classification}</td>
-                  <td>{new Date(item.effective_start).toLocaleDateString()}</td>
-                  <td>{new Date(item.effective_end).toLocaleDateString()}</td>
-                  <td>{item.icao_location}</td>
-                  <td>{item.id}</td>
-                  <td>{new Date(item.issued).toLocaleDateString()}</td>
-                  <td>{new Date(item.last_updated).toLocaleDateString()}</td>
-                  <td>{item.location}</td>
-                  <td>{item.maximum_fl}</td>
-                  <td>{item.minimum_fl}</td>
-                  <td>{item.number}</td>
-                  <td>{item.purpose}</td>
-                  <td>{item.scope}</td>
-                  <td>{item.selection_code}</td>
-                  <td>{item.series}</td>
-                  {/* <td>{item.text}</td> */}
-                  <td>{item.traffic}</td>
-                  <td>{item.type}</td>
-                </tr>
+            Customize Columns &#x25BC;
+          </button>
+
+          {showColumnDropdown && (
+            <div className="dropdown-menu">
+              {[
+                "account_id",
+                "affected_fir",
+                "classification",
+                "effective_start",
+                "effective_end",
+                "icao_location",
+                "id",
+                "issued",
+                "last_updated",
+                "location",
+                "maximum_fl",
+                "minimum_fl",
+                "number",
+                "purpose",
+                "scope",
+                "selection_code",
+                "series",
+                // "text",
+                "traffic",
+                "type",
+              ].map((col) => (
+                <div key={col} className="dropdown-item">
+                  <input
+                    type="checkbox"
+                    value={col}
+                    checked={visibleColumns.includes(col)}
+                    onChange={(e) => {
+                      const { value, checked } = e.target;
+                      if (checked) {
+                        setVisibleColumns([...visibleColumns, value]);
+                      } else {
+                        setVisibleColumns(
+                          visibleColumns.filter((col) => col !== value)
+                        );
+                      }
+                    }}
+                  />
+                  <label>{col.replace(/_/g, " ")}</label>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          )}
         </div>
-      ) : null}
+      </div>
+
+      {error && <div className="notam-error">{error}</div>}
+      {notams && notams.length > 0 && (
+        <>
+          <h1>NOTAM Data</h1>
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  {visibleColumns.includes("account_id") && <th>Account ID</th>}
+                  {visibleColumns.includes("affected_fir") && <th>Affected FIR</th>}
+                  {visibleColumns.includes("classification") && <th>Classification</th>}
+                  {visibleColumns.includes("effective_start") && <th>Effective Start</th>}
+                  {visibleColumns.includes("effective_end") && <th>Effective End</th>}
+                  {visibleColumns.includes("icao_location") && <th>ICAO Location</th>}
+                  {visibleColumns.includes("id") && <th>ID</th>}
+                  {visibleColumns.includes("issued") && <th>Issued</th>}
+                  {visibleColumns.includes("last_updated") && <th>Last Updated</th>}
+                  {visibleColumns.includes("location") && <th>Location</th>}
+                  {visibleColumns.includes("maximum_fl") && <th>Maximum FL</th>}
+                  {visibleColumns.includes("minimum_fl") && <th>Minimum FL</th>}
+                  {visibleColumns.includes("number") && <th>Number</th>}
+                  {visibleColumns.includes("purpose") && <th>Purpose</th>}
+                  {visibleColumns.includes("scope") && <th>Scope</th>}
+                  {visibleColumns.includes("selection_code") && <th>Selection Code</th>}
+                  {visibleColumns.includes("series") && <th>Series</th>}
+                  {/* {visibleColumns.includes("text") && <th>Text</th>} */}
+                  {visibleColumns.includes("traffic") && <th>Traffic</th>}
+                  {visibleColumns.includes("type") && <th>Type</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {notams.map((item, index) => (
+                  <tr key={index}>
+                    {visibleColumns.includes("account_id") && <td>{item.account_id}</td>}
+                    {visibleColumns.includes("affected_fir") && <td>{item.affected_fir}</td>}
+                    {visibleColumns.includes("classification") && <td>{item.classification}</td>}
+                    {visibleColumns.includes("effective_start") && (
+                      <td>{new Date(item.effective_start).toLocaleDateString()}</td>
+                    )}
+                    {visibleColumns.includes("effective_end") && (
+                      <td>{new Date(item.effective_end).toLocaleDateString()}</td>
+                    )}
+                    {visibleColumns.includes("icao_location") && <td>{item.icao_location}</td>}
+                    {visibleColumns.includes("id") && <td>{item.id}</td>}
+                    {visibleColumns.includes("issued") && (
+                      <td>{new Date(item.issued).toLocaleDateString()}</td>
+                    )}
+                    {visibleColumns.includes("last_updated") && (
+                      <td>{new Date(item.last_updated).toLocaleDateString()}</td>
+                    )}
+                    {visibleColumns.includes("location") && <td>{item.location}</td>}
+                    {visibleColumns.includes("maximum_fl") && <td>{item.maximum_fl}</td>}
+                    {visibleColumns.includes("minimum_fl") && <td>{item.minimum_fl}</td>}
+                    {visibleColumns.includes("number") && <td>{item.number}</td>}
+                    {visibleColumns.includes("purpose") && <td>{item.purpose}</td>}
+                    {visibleColumns.includes("scope") && <td>{item.scope}</td>}
+                    {visibleColumns.includes("selection_code") && <td>{item.selection_code}</td>}
+                    {visibleColumns.includes("series") && <td>{item.series}</td>}
+                    {/* {visibleColumns.includes("text") && <td>{item.text}</td>} */}
+                    {visibleColumns.includes("traffic") && <td>{item.traffic}</td>}
+                    {visibleColumns.includes("type") && <td>{item.type}</td>}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 };
