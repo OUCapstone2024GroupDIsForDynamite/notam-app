@@ -6,27 +6,16 @@ const NotamCard = () => {
   const [arrivalLocation, setArrivalLocation] = useState("");
   const [notams, setNotams] = useState(null);
   const [error, setError] = useState("");
+  // default columns
   const [visibleColumns, setVisibleColumns] = useState([
-    "account_id",
-    "affected_fir",
-    "classification",
+    "location",
+    "issued",
+    "id",
+    "text",
+    "type",
     "effective_start",
     "effective_end",
-    "icao_location",
-    "id",
-    "issued",
-    "last_updated",
-    "location",
-    "maximum_fl",
-    "minimum_fl",
-    "number",
-    "purpose",
-    "scope",
-    "selection_code",
-    "series",
-    // "text",
     "traffic",
-    "type",
   ]);
 
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
@@ -73,8 +62,15 @@ const NotamCard = () => {
     }
   };
 
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setVisibleColumns((prevColumns) => {
+      if (checked) {
+        return [...prevColumns, value];
+      } else {
+        return prevColumns.filter((col) => col !== value);
+      }
+    });
   };
 
   return (
@@ -125,7 +121,7 @@ const NotamCard = () => {
                 "scope",
                 "selection_code",
                 "series",
-                // "text",
+                "text",
                 "traffic",
                 "type",
               ].map((col) => (
@@ -134,16 +130,7 @@ const NotamCard = () => {
                     type="checkbox"
                     value={col}
                     checked={visibleColumns.includes(col)}
-                    onChange={(e) => {
-                      const { value, checked } = e.target;
-                      if (checked) {
-                        setVisibleColumns([...visibleColumns, value]);
-                      } else {
-                        setVisibleColumns(
-                          visibleColumns.filter((col) => col !== value)
-                        );
-                      }
-                    }}
+                    onChange={handleCheckboxChange}
                   />
                   <label>{col.replace(/_/g, " ")}</label>
                 </div>
@@ -178,7 +165,7 @@ const NotamCard = () => {
                   {visibleColumns.includes("scope") && <th>Scope</th>}
                   {visibleColumns.includes("selection_code") && <th>Selection Code</th>}
                   {visibleColumns.includes("series") && <th>Series</th>}
-                  {/* {visibleColumns.includes("text") && <th>Text</th>} */}
+                  {visibleColumns.includes("text") && <th>Text</th>}
                   {visibleColumns.includes("traffic") && <th>Traffic</th>}
                   {visibleColumns.includes("type") && <th>Type</th>}
                 </tr>
@@ -211,7 +198,9 @@ const NotamCard = () => {
                     {visibleColumns.includes("scope") && <td>{item.scope}</td>}
                     {visibleColumns.includes("selection_code") && <td>{item.selection_code}</td>}
                     {visibleColumns.includes("series") && <td>{item.series}</td>}
-                    {/* {visibleColumns.includes("text") && <td>{item.text}</td>} */}
+                    {visibleColumns.includes("text") && (
+                      <td className="text-column">{item.text}</td>
+                    )}
                     {visibleColumns.includes("traffic") && <td>{item.traffic}</td>}
                     {visibleColumns.includes("type") && <td>{item.type}</td>}
                   </tr>

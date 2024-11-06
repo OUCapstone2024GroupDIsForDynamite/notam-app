@@ -173,6 +173,14 @@ th, td {
   text-align: left;
 }
 
+/*text column adjustment*/
+td.text-column {
+  max-width: 300px; 
+  word-wrap: break-word;
+  white-space: normal; 
+  overflow: hidden; 
+}
+
 @media screen and (max-width: 768px) {
   .table-wrapper {
     width: 100%;
