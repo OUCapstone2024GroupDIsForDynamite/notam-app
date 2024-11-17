@@ -30,6 +30,11 @@ class Notam:
         # Text might not have a default in the original JSON, so consider handling it if needed.
         self.text = core_data.get('text', None)
 
+        # Initialize importance for all notams at 100
+        # Importance is an integer value from 0-100, with 100 being the least important
+        # To sort a list of notams, use notams.sort(key=lambda notam: notam.importance)
+        self.importance = 100
+
     def __eq__(self, other):
         if isinstance(other, Notam):
             return self.id == other.id
