@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 from utilities.GeoUtilities import GeoUtilities
 from utilities.NotamFetcher import NotamFetcher
-from utilities.DummySorter import DummySorter
+from utilities.KeywordSorter import KeywordSorter
 from objects.Coordinate import Coordinate
 
 import sys
@@ -35,8 +35,8 @@ def generate_flight_briefing(airport_a, airport_b):
     notam_fetcher = NotamFetcher()
     notams = notam_fetcher.fetch_by_coordinates(flightpath_coords)
     
-    # Sort Notams. "Dummy" can be replaced by any implementing class of NotamSorter
-    notams = DummySorter().sort(notams)
+    # Sort Notams with an implementing class of NotamSorter
+    notams = KeywordSorter().sort(notams)
     
 
     # Convert Notam objects to dictionaries for JSON serialization
