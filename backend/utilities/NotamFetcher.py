@@ -12,7 +12,7 @@ class NotamFetcher:
         }
         self.response_format = 'geoJson'
 
-    def fetch_by_coordinates(self, coordinates, radius=10):
+    def fetch_by_coordinates(self, coordinates, radius=40):
         # Returns notams as Notam objects based on an array of coordinates and a radius
         notams = set()
 

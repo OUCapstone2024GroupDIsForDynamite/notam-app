@@ -48,7 +48,7 @@ class GeoUtilities():
         #Returns the coordinate for the airport
         return self.icao_codes.get(airport) or self.iata_codes.get(airport) or self.faa_codes.get(airport)
         
-    def build_flight_path(self, coordinate_start, coordinate_end, distance_between_points = 150):
+    def build_flight_path(self, coordinate_start, coordinate_end, distance_between_points = 32):
         """Return flight path points between two coordinates"""
         """Under Construction"""
         #calculate the distance between two given airports in statue miles
