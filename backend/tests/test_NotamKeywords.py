@@ -1,5 +1,6 @@
 import unittest
 import csv
+import json
 
 from objects.Notam import Notam
 from utilities.NotamFetcher import NotamFetcher
@@ -12,50 +13,54 @@ class TestNotamKeywords(unittest.TestCase):
         pass
 
     def test_sort_by_importance(self):
-        geo_utils = GeoUtilities()
+        notams = self.read_notams_from_json("notam_sample.json")
+        # geo_utils = GeoUtilities()
 
-        airport_a_coor = geo_utils.geo_resolve("SAN")
-        airport_b_coor = geo_utils.geo_resolve("BOS")
-        flightpath_coords = geo_utils.build_flight_path(airport_a_coor, airport_b_coor)
+        # SAN_coord = geo_utils.geo_resolve("SAN")
+        # ATL_coord = geo_utils.geo_resolve("ATL")
+        # SFO_coord = geo_utils.geo_resolve("SFO")
+        # DCA_coord = geo_utils.geo_resolve("DCA")
+        # SEA_coord = geo_utils.geo_resolve("SEA")
+        # BOS_coord = geo_utils.geo_resolve("BOS")
 
-        # Request Notams
-        notam_fetcher = NotamFetcher()
-        notams = notam_fetcher.fetch_by_coordinates(flightpath_coords)
+        # SAN_ATL_coords = geo_utils.build_flight_path(SAN_coord, ATL_coord)
+        # SFO_DCA_coords = geo_utils.build_flight_path(SFO_coord, DCA_coord)
+        # SEA_BOS_coords = geo_utils.build_flight_path(SEA_coord, BOS_coord)
 
-        field_names = [
-            "account_id", "affected_fir", "classification", "effective_start", 
-            "effective_end", "icao_location", "id", "issued", "last_updated", 
-            "location", "maximum_fl", "minimum_fl", "number", "purpose", 
-            "scope", "series", "traffic"
-        ]
 
+        # # Request Notams
+        # notam_fetcher = NotamFetcher()
+        # notams = notam_fetcher.fetch_by_coordinates(SAN_ATL_coords)
+        # notams.extend(notam_fetcher.fetch_by_coordinates(SFO_DCA_coords))
+        # notams.extend(notam_fetcher.fetch_by_coordinates(SEA_BOS_coords))
+
+        # field_names = [
+        #     "account_id", "affected_fir", "classification", "effective_start", 
+        #     "effective_end", "icao_location", "id", "issued", "last_updated", 
+        #     "location", "maximum_fl", "minimum_fl", "number", "purpose", 
+        #     "scope", "series", "traffic", "text"
+        # ]
+
+        # print(notams[0].jsonify_notam())
+
+        # self.write_notams_to_csv(notams, "notam_sample.json")
 
         tuple_counts = Counter()
     
+        # Get frequencies of two keywords in a row
         for notam in notams:
             # Extract keywords from the "text" field
             text_field = getattr(notam, "text", "")
             words = text_field.split()
-            
-            # Count tuples of (keyword, other fields)
-            for keyword in words:
-                for field in field_names:
-                    other_field = getattr(notam, field)
-                    if str(other_field).lower() == "none":
-                        continue
-                    tuple_counts[(keyword, (field, other_field))] += 1
 
-        self.display_tuple_counts_to_csv(tuple_counts, "SAN-BOS")
+            for i in range (len(words) - 1):
+                tuple_counts[(words[i], words[i+1])] += 1
 
-    def display_tuple_counts_to_csv(self, tuple_counts, csv_filename):
-        """
-        Writes the counts of tuples to a CSV file in the format:
-        number of occurrences, attribute.
+        self.tuple_counts_to_csv(tuple_counts, "two-keywords.csv")
 
-        Args:
-            tuple_counts (dict): A dictionary where keys are tuples and values are counts.
-            csv_filename (str): The name of the CSV file to write the results.
-        """
+    def tuple_counts_to_csv(self, tuple_counts, csv_filename):
+        """Writes counts and attributes to a csv file"""
+
         with open(csv_filename, mode="w", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             # Write the header row
@@ -67,6 +72,31 @@ class TestNotamKeywords(unittest.TestCase):
 
         print(f"Results have been written to {csv_filename}")
 
+    def write_notams_to_json(self, notams, json_filename):
+        structured_data = [
+            {
+                "properties": {
+                    "coreNOTAMData": {
+                        "notam": notam.__dict__
+                    }
+                }
+            }
+            for notam in notams
+        ]
+    
+        with open(json_filename, mode="w", encoding="utf-8") as jsonfile:
+            json.dump(structured_data, jsonfile, indent=4)
+        
+        print(f"NOTAMs written to {json_filename}")
+    
+    def read_notams_from_json(self, json_filename):
+        with open(json_filename, mode="r", encoding="utf-8") as jsonfile:
+            data = json.load(jsonfile)
+
+        # Recreate the list of NOTAM objects
+        notams = [Notam(json.dumps(item)) for item in data]
+        print(f"NOTAMs read from {json_filename}")
+        return notams
 
 
     if __name__ == '__main__':
