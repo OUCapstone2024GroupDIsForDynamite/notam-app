@@ -12,41 +12,13 @@ class TestNotamKeywords(unittest.TestCase):
     def setUpClass(cls):
         pass
 
-    def test_sort_by_importance(self):
+    def test_frequencies(self):
         notams = self.read_notams_from_json("notam_sample.json")
-        # geo_utils = GeoUtilities()
-
-        # SAN_coord = geo_utils.geo_resolve("SAN")
-        # ATL_coord = geo_utils.geo_resolve("ATL")
-        # SFO_coord = geo_utils.geo_resolve("SFO")
-        # DCA_coord = geo_utils.geo_resolve("DCA")
-        # SEA_coord = geo_utils.geo_resolve("SEA")
-        # BOS_coord = geo_utils.geo_resolve("BOS")
-
-        # SAN_ATL_coords = geo_utils.build_flight_path(SAN_coord, ATL_coord)
-        # SFO_DCA_coords = geo_utils.build_flight_path(SFO_coord, DCA_coord)
-        # SEA_BOS_coords = geo_utils.build_flight_path(SEA_coord, BOS_coord)
-
-
-        # # Request Notams
-        # notam_fetcher = NotamFetcher()
-        # notams = notam_fetcher.fetch_by_coordinates(SAN_ATL_coords)
-        # notams.extend(notam_fetcher.fetch_by_coordinates(SFO_DCA_coords))
-        # notams.extend(notam_fetcher.fetch_by_coordinates(SEA_BOS_coords))
-
-        # field_names = [
-        #     "account_id", "affected_fir", "classification", "effective_start", 
-        #     "effective_end", "icao_location", "id", "issued", "last_updated", 
-        #     "location", "maximum_fl", "minimum_fl", "number", "purpose", 
-        #     "scope", "series", "traffic", "text"
-        # ]
-
-        # print(notams[0].jsonify_notam())
-
-        # self.write_notams_to_csv(notams, "notam_sample.json")
 
         tuple_counts = Counter()
     
+        ## This is the section that you would change to test different frequencies
+
         # Get frequencies of two keywords in a row
         for notam in notams:
             # Extract keywords from the "text" field
