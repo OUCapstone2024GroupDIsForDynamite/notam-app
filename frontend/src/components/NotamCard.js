@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import "../styles/NotamCard.css"; // Import the CSS file for styling
+import "../styles/NotamCard.css";
+import NotamDetailCard from "./NotamDetailCard"; 
 
 const NotamCard = () => {
   const [departureLocation, setDepartureLocation] = useState("");
   const [arrivalLocation, setArrivalLocation] = useState("");
   const [notams, setNotams] = useState(null);
   const [error, setError] = useState("");
-  // default columns
+const [selectedNotam, setSelectedNotam] = useState(null);
+const handleRowClick = (notam) => setSelectedNotam(notam);
+// default columns
   const [visibleColumns, setVisibleColumns] = useState([
     "location",
     "issued",
@@ -100,7 +103,7 @@ const NotamCard = () => {
           >
             Customize Columns &#x25BC;
           </button>
-
+  
           {showColumnDropdown && (
             <div className="dropdown-menu">
               {[
@@ -139,7 +142,7 @@ const NotamCard = () => {
           )}
         </div>
       </div>
-
+  
       {error && <div className="notam-error">{error}</div>}
       {notams && notams.length > 0 && (
         <>
@@ -172,7 +175,7 @@ const NotamCard = () => {
               </thead>
               <tbody>
                 {notams.map((item, index) => (
-                  <tr key={index}>
+                  <tr key={index} onClick={() => handleRowClick(item)}>
                     {visibleColumns.includes("account_id") && <td>{item.account_id}</td>}
                     {visibleColumns.includes("affected_fir") && <td>{item.affected_fir}</td>}
                     {visibleColumns.includes("classification") && <td>{item.classification}</td>}
@@ -210,8 +213,13 @@ const NotamCard = () => {
           </div>
         </>
       )}
+  
+      {/* Render NotamDetailCard if a NOTAM is selected */}
+      {selectedNotam && (
+        <NotamDetailCard notam={selectedNotam} onClose={() => setSelectedNotam(null)} />
+      )}
     </div>
-  );
+  );  
 };
 
 export default NotamCard;
